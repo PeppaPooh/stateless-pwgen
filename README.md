@@ -14,10 +14,12 @@ Deterministic password generator using Argon2id + HKDF. Given a master secret an
 
 
 
-For a more detailed discussion of deterministic password managers:
+For more detailed discussions of deterministic password managers:
 https://samuellucas.com/2024/02/25/deterministic-password-managers-revisited.html
+https://medium.com/@mahdix/in-defense-of-deterministic-password-managers-67b5a549681e
 
-For a fun illustration of the password hell:
+
+For a fun illustration of our password hell:
 https://neal.fun/password-game/
 
 
