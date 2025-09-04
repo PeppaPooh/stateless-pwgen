@@ -5,15 +5,21 @@ Deterministic password generator using Argon2id + HKDF. Given a master secret an
 
 ## Why use stateless-pwgen?
 
-- Sharing passwords across sites is a security risk, since a single leak exposes your credentials for attackers to use everywhere else.
-- Relying on memory to keep track of numerous passwords across numerous sites, each with different formatting requirements, is stupidly impractical.
+- Using the same passwords across sites is a security risk, since a single leak exposes your credentials for attackers to use everywhere else. Even ignoring security, different sites will torture you by differing rules for characters, spaces, capital letters, etc., or require frequent password changes.
+- Memorizing numerous passwords across numerous sites, each with different formatting requirements, is stupidly impractical.
 - Relying on a cloud-based password manager which use a master password or 2FA to keep track of different, site-specific passwords *can* be sound, but can result in your credentials (including your precious master password!) being exposed if you choose the wrong service. Google "password manager leaks".
 - Relying on a local password manager -- whether a well-encrypted one or less sound options like a word document -- will leave you without all your passowords should your device be separated from you, stolen, or broken.
 - Cyber security aside, depending on an external service for your passwords is just horrifying. They could stop their service or lose your data or inexplicably fail all your authentications when you use a different device.
 - More traditional browser-based password managers, deterministic or not, are often confused by login domain names, and confuse email prompts with password prompts.
 
 
+
+For a more detailed discussion of deterministic password managers:
 https://samuellucas.com/2024/02/25/deterministic-password-managers-revisited.html
+
+For a fun illustration of the password hell:
+https://neal.fun/password-game/
+
 
 ### "An attacker can reverse engineer your master password from a leaked site-specific password, and then ALL your credentials are compromised!"
 This problem is addressed in the following ways:
@@ -23,9 +29,10 @@ This problem is addressed in the following ways:
 ### "I need to change a password for a single site without changing every other password."
 Either 1) use the --version flag to rotate different passwords, or 2) put notes in the site identifier
 
-### Remaining problems
+### Limitations
 1. stateless-pwgen does not defend against phishing, which a browser-extension password keeper can by noting the different url.
 2. GUI is still under development. --master-prompt doesn't show the password, so typos can happen.
+3. Does not keep track of usernames or other login info. TODO cache non-password login info
 
 
 ## How to Build
