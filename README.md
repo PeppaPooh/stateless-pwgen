@@ -20,7 +20,7 @@ This problem is addressed in the following ways:
 1. Argon2id is used as the KDF to make guessing expensive.
 2. The user-input site identifiers can be used as a second key - you can use aliases for site names, add dates in the string for password versioning, or even set each site identifier as a high-entropy string which you store in a password vault service.
 
-### "I need to change a password for a single site without changing every other password"
+### "I need to change a password for a single site without changing every other password."
 Either 1) use the --version flag to rotate different passwords, or 2) put notes in the site identifier
 
 ### Remaining problems
