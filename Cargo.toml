@@ -1,0 +1,42 @@
+[package]
+name = "pwgen"
+version = "0.1.0"
+edition = "2021"
+
+# Optional but recommended metadata
+description = "Deterministic password generator using Argon2id and HKDF"
+license = "MIT OR Apache-2.0"
+
+# Use the new feature resolver for workspaces (harmless for single crate)
+resolver = "2"
+
+[[bin]]
+name = "pwgen"
+path = "src/main.rs"
+
+[dependencies]
+# CLI parsing
+clap = { version = "4", features = ["derive"] }
+
+# KDFs and crypto primitives
+argon2 = "0.5"
+sha2 = "0.10"
+hkdf = "0.12"
+hmac = "0.12"
+
+# Error handling
+anyhow = "1"
+thiserror = "1"
+
+# Secret zeroization
+zeroize = "1"
+
+# Optional TTY password prompt (enable via the `tty` feature)
+rpassword = { version = "7", optional = true }
+itoa = "1"
+
+[features]
+default = []
+# Enable silent TTY master prompt support
+tty = ["rpassword"]
+
