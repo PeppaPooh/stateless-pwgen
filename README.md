@@ -1,8 +1,34 @@
 # pwgen
 
-Deterministic password generator using Argon2id + HKDF. Given a master secret and site identifier, produces per-site passwords with configurable policy.
+Deterministic password generator using Argon2id + HKDF. Given a master secret and manually entered site identifier, produces per-site passwords with configurable policy. 
 
-## Build
+
+## Why use stateless-pwgen?
+
+- Sharing passwords across sites is a security risk, since a single leak exposes your credentials for attackers to use everywhere else.
+- Relying on memory to keep track of numerous passwords across numerous sites, each with different formatting requirements, is stupidly impractical.
+- Relying on a cloud-based password manager which use a master password or 2FA to keep track of different, site-specific passwords *can* be sound, but can result in your credentials (including your precious master password!) being exposed if you choose the wrong service. Google "password manager leaks".
+- Relying on a local password manager -- whether a well-encrypted one or less sound options like a word document -- will leave you without all your passowords should your device be separated from you, stolen, or broken.
+- Cyber security aside, depending on an external service for your passwords is just horrifying. They could stop their service or lose your data or inexplicably fail all your authentications when you use a different device.
+- More traditional browser-based password managers, deterministic or not, are often confused by login domain names, and confuse email prompts with password prompts.
+
+
+https://samuellucas.com/2024/02/25/deterministic-password-managers-revisited.html
+
+### "An attacker can reverse engineer your master password from a leaked site-specific password, and then ALL your credentials are compromised!"
+This problem is addressed in the following ways:
+1. Argon2id is used as the KDF to make guessing expensive.
+2. The user-input site identifiers **can** be used as a second key - you can use aliases for site names, add dates in the string for password versioning, or even set each site identifier as a high-entropy string which you store in a password vault service.
+
+### "I need to change to a different password for a single site without changing every other password"
+Either 1) use the --version flag to rotate different passwords, or 2) put notes in the site identifier
+
+### Remaining problems
+1. stateless-pwgen does not defend against phishing, which a browser-extension password keeper can by noting the different url.
+2. GUI is still under development. --master-prompt doesn't show the password, so types can happen.
+
+
+## How to Build
 
 - Default build:
 
@@ -16,7 +42,7 @@ cargo build --release
 cargo build --release --features tty
 ```
 
-## Usage
+## How to use
 
 ```
 pwgen generate \

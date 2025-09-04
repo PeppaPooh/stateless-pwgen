@@ -169,6 +169,18 @@
       "bases:Create new base": false
     }
   },
-  "active": "272b2f2f759aaf7d",
-  "lastOpenFiles": []
+  "active": "39ed1d2b931653fc",
+  "lastOpenFiles": [
+    "target/debug/incremental/golden-2tzjefouga8bl/s-hasj9ogbks-1mn3su8-8owl4bz2tu40f0awsu0dep3st/work-products.bin",
+    "target/debug/incremental/golden-2tzjefouga8bl/s-hasj9ogbks-1mn3su8-8owl4bz2tu40f0awsu0dep3st/query-cache.bin",
+    "target/debug/incremental/golden-2tzjefouga8bl/s-hasj9ogbks-1mn3su8-8owl4bz2tu40f0awsu0dep3st/ezz3xqdbbtfjolsvkiwi572iz.o",
+    "target/debug/incremental/golden-2tzjefouga8bl/s-hasj9ogbks-1mn3su8-8owl4bz2tu40f0awsu0dep3st/ed6tfwdvr7fhsqqc3z9k0cmbg.o",
+    "target/debug/incremental/golden-2tzjefouga8bl/s-hasj9ogbks-1mn3su8-8owl4bz2tu40f0awsu0dep3st/emosryvf4atmto9aar9uooyv6.o",
+    "target/debug/incremental/golden-2tzjefouga8bl/s-hasj9ogbks-1mn3su8-8owl4bz2tu40f0awsu0dep3st/e6wwsyk7iprjistzc6xyv2888.o",
+    "target/debug/incremental/golden-2tzjefouga8bl/s-hasj9ogbks-1mn3su8-8owl4bz2tu40f0awsu0dep3st/dp3v2fu69haafu8krotsqpagz.o",
+    "target/debug/incremental/golden-2tzjefouga8bl/s-hasj9ogbks-1mn3su8-8owl4bz2tu40f0awsu0dep3st/cs0mx2lay1395ey5vicd3565m.o",
+    "target/debug/incremental/golden-2tzjefouga8bl/s-hasj9ogbks-1mn3su8-8owl4bz2tu40f0awsu0dep3st/dep-graph.bin",
+    "target/debug/incremental/golden-2tzjefouga8bl/s-hasj9ogbks-1mn3su8-8owl4bz2tu40f0awsu0dep3st/bqz4m6wa43epoernjlhhtgiij.o",
+    "target/debug/incremental/golden-2tzjefouga8bl/s-hasj9ogbks-1mn3su8-8owl4bz2tu40f0awsu0dep3st/bf8eerr5qzbs1yyi3awpxv4gm.o"
+  ]
 }
