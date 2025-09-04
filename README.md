@@ -18,14 +18,14 @@ https://samuellucas.com/2024/02/25/deterministic-password-managers-revisited.htm
 ### "An attacker can reverse engineer your master password from a leaked site-specific password, and then ALL your credentials are compromised!"
 This problem is addressed in the following ways:
 1. Argon2id is used as the KDF to make guessing expensive.
-2. The user-input site identifiers **can** be used as a second key - you can use aliases for site names, add dates in the string for password versioning, or even set each site identifier as a high-entropy string which you store in a password vault service.
+2. The user-input site identifiers can be used as a second key - you can use aliases for site names, add dates in the string for password versioning, or even set each site identifier as a high-entropy string which you store in a password vault service.
 
 ### "I need to change to a different password for a single site without changing every other password"
 Either 1) use the --version flag to rotate different passwords, or 2) put notes in the site identifier
 
 ### Remaining problems
 1. stateless-pwgen does not defend against phishing, which a browser-extension password keeper can by noting the different url.
-2. GUI is still under development. --master-prompt doesn't show the password, so types can happen.
+2. GUI is still under development. --master-prompt doesn't show the password, so typos can happen.
 
 
 ## How to Build
@@ -161,6 +161,29 @@ cargo test
 
 - Lint (via compiler warnings): ensure `cargo build` is clean.
 
+## Test vectors (for manual testing)
+
+```text
+master = "master123"
+site   = "example.com"
+username   = "alice"
+password = "!uZ5S_;H@x-m"
+```
+
+```text
+master = "master123"
+site   = "different.com"
+version = 2
+username   = "alice"
+password = "_;|}p%]+f*Hk2"
+```
+
+```text
+master = "master123"
+site   = "test.com"
+policy = { length=8, force=[lower,upper] }
+password = "Iv(N\wq="
+```
 ## License
 
 Licensed under Apache-2.0
