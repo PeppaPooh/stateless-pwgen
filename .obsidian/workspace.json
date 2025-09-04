@@ -171,16 +171,17 @@
   },
   "active": "e47ad7753da778de",
   "lastOpenFiles": [
-    "README.md",
+    "target/release/pwgen",
+    "target/release/pwgen-v0.1.0-aarch64-apple-darwin",
     "target/release/deps/pwgen-b04aacd175f4ce01",
     "target/release/deps/pwgen-b04aacd175f4ce01.pwgen.eec68613301e77c9-cgu.00.rcgu.o",
-    "target/release/deps/pwgen-b04aacd175f4ce01.pwgen.eec68613301e77c9-cgu.04.rcgu.o",
-    "target/release/deps/pwgen-b04aacd175f4ce01.pwgen.eec68613301e77c9-cgu.15.rcgu.o",
     "target/release/deps/pwgen-b04aacd175f4ce01.pwgen.eec68613301e77c9-cgu.08.rcgu.o",
-    "target/release/deps/pwgen-b04aacd175f4ce01.pwgen.eec68613301e77c9-cgu.10.rcgu.o",
+    "target/release/deps/pwgen-b04aacd175f4ce01.pwgen.eec68613301e77c9-cgu.04.rcgu.o",
+    "target/release/deps/pwgen-b04aacd175f4ce01.pwgen.eec68613301e77c9-cgu.09.rcgu.o",
+    "target/release/deps/pwgen-b04aacd175f4ce01.pwgen.eec68613301e77c9-cgu.15.rcgu.o",
     "target/release/deps/pwgen-b04aacd175f4ce01.pwgen.eec68613301e77c9-cgu.12.rcgu.o",
-    "target/release/deps/pwgen-b04aacd175f4ce01.pwgen.eec68613301e77c9-cgu.06.rcgu.o",
     "target/release/deps/pwgen-b04aacd175f4ce01.pwgen.eec68613301e77c9-cgu.13.rcgu.o",
-    "target/release/deps/pwgen-b04aacd175f4ce01.pwgen.eec68613301e77c9-cgu.09.rcgu.o"
+    "target/release/deps/pwgen-b04aacd175f4ce01.pwgen.eec68613301e77c9-cgu.10.rcgu.o",
+    "README.md"
   ]
 }

@@ -9,7 +9,7 @@ Deterministic password generator using Argon2id + HKDF. Given a master secret an
 - Memorizing numerous passwords across numerous sites, each with different formatting requirements, is stupidly impractical.
 - Relying on a cloud-based password manager which use a master password or 2FA to keep track of different, site-specific passwords *can* be sound, but can result in your credentials (including your precious master password!) being exposed if you choose the wrong service. Google "password manager leaks".
 - Relying on a local password manager -- whether a well-encrypted one or less sound options like a word document -- will leave you without all your passowords should your device be separated from you, stolen, or broken.
-- Cyber security aside, depending on an external service for your passwords is just horrifying. They could stop their service or lose your data or inexplicably fail all your authentications when you use a different device.
+- Security aside, depending on an external service for your passwords is just horrifying. They could stop their service or lose your data or inexplicably fail all your authentications when you use a different device.
 - More traditional browser-based password managers, deterministic or not, are often confused by login domain names, and confuse email prompts with password prompts.
 
 
@@ -30,6 +30,17 @@ This problem is addressed in the following ways:
 
 ### "I need to change a password for a single site without changing every other password."
 Either 1) use the --version flag to rotate different passwords, or 2) put notes in the site identifier
+
+
+### Recommended use cases
+#### 1. For convenience
+Use conventional password management on your stateless-pwgen generated passwords. Use stateless-pwgen as plan B (a safer replacement to the "backup password book") for when you can't recover your password. Since this changes your different passwords across
+Slightly less security than using true random passwords with conventional password management, but ***if you are deterred from random passwords by the fear of losing them, this is the solution.***
+
+#### 2. For security
+Use a conventional password management tool to manage truly random string(s) which you use as site identifier(s). Obviously very inconvenient, but leak-proofs your passwords. 
+
+
 
 ### Limitations
 1. stateless-pwgen does not defend against phishing, which a browser-extension password keeper can by noting the different url.
