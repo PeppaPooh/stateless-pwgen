@@ -2,7 +2,6 @@
 
 Deterministic password generator using Argon2id + HKDF. Given a master secret and manually entered site identifier, produces per-site passwords with configurable policy. 
 
-
 ## Why use stateless-pwgen?
 
 - Using the same passwords across sites is a security risk, since a single leak exposes your credentials for attackers to use everywhere else. Even ignoring security, different sites will torture you by differing rules for characters, spaces, capital letters, etc., or require frequent password changes.
@@ -32,17 +31,16 @@ This problem is addressed in the following ways:
 Either 1) use the --version flag to rotate different passwords, or 2) put notes in the site identifier
 
 
-### Recommended use cases
+## Recommended use cases
 #### 1. For convenience
-Use conventional password management on your stateless-pwgen generated passwords. Use stateless-pwgen as plan B (a safer replacement to the "backup password book") for when you can't recover your password. Since this changes your different passwords across
-Slightly less security than using true random passwords with conventional password management, but ***if you are deterred from random passwords by the fear of losing them, this is the solution.***
+Use conventional password management on your stateless-pwgen generated passwords. Use stateless-pwgen as plan B (a safer replacement to the "backup password book") for when you can't recover your password. This has slightly less security than using true random passwords with conventional password management, but ***if you are deterred from random passwords by the fear of losing them, this is the solution.***
 
 #### 2. For security
-Use a conventional password management tool to manage truly random string(s) which you use as site identifier(s). Obviously very inconvenient, but leak-proofs your passwords. 
+Use a conventional password management tool to manage truly random string(s) which you use as site identifier(s) for stateless-pwgen. Obviously very inconvenient, but leak-proofs your passwords. 
 
 
 
-### Limitations
+## Limitations
 1. stateless-pwgen does not defend against phishing, which a browser-extension password keeper can by noting the different url.
 2. GUI is still under development. --master-prompt doesn't show the password, so typos can happen.
 3. Does not keep track of usernames or other login info. TODO cache non-password login info
