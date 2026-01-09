@@ -396,3 +396,87 @@ fn character_distribution_test_vectors() {
     assert!(has_digit, "Should generate digits");
     assert!(has_symbol, "Should generate symbols");
 }
+
+/// Test that validates the contract: generator should never return InvalidInput
+/// for policy-related reasons when called with a validated policy.
+#[test]
+fn generator_contract_validated_policy() {
+    use pwgen::generator::GenError;
+    
+    // Test various validated policies - none should cause InvalidInput
+    let test_policies = vec![
+        // Standard policy
+        policy::Policy {
+            min: 12,
+            max: 16,
+            allow: [true, true, true, true],
+            force: [false, false, false, false],
+        },
+        // Min equals forced count
+        policy::Policy {
+            min: 4,
+            max: 8,
+            allow: [true, true, true, true],
+            force: [true, true, true, true],
+        },
+        // Clamped values
+        policy::Policy {
+            min: 0,
+            max: 200,
+            allow: [true, true, true, true],
+            force: [false, false, false, false],
+        },
+        // Single character set
+        policy::Policy {
+            min: 10,
+            max: 10,
+            allow: [false, false, true, false],
+            force: [false, false, false, false],
+        },
+        // Max length
+        policy::Policy {
+            min: 128,
+            max: 128,
+            allow: [true, true, true, true],
+            force: [false, false, false, false],
+        },
+        // Minimum length with forced sets
+        policy::Policy {
+            min: 2,
+            max: 2,
+            allow: [true, true, false, false],
+            force: [true, true, false, false],
+        },
+    ];
+    
+    for pol in test_policies {
+        // Validate the policy first
+        let validated = match policy::validate(&pol) {
+            Ok(p) => p,
+            Err(_) => continue, // Skip invalid policies (we test those separately)
+        };
+        
+        // Generate password - should never return InvalidInput for policy reasons
+        let result = generator::generate_password("master123", "test.com", None, &validated, 1);
+        
+        match result {
+            Ok(_) => {
+                // Success - this is fine
+            }
+            Err(GenError::InvalidInput(msg)) => {
+                panic!(
+                    "generate_password returned InvalidInput for validated policy: {}. \
+                     Policy: min={}, max={}, allow={:?}, force={:?}",
+                    msg, validated.min, validated.max, validated.allow, validated.force
+                );
+            }
+            Err(GenError::Policy(_)) => {
+                // Policy error should not happen after validation
+                panic!("generate_password returned Policy error for validated policy");
+            }
+            Err(GenError::Kdf(_)) | Err(GenError::Prng(_)) => {
+                // These are acceptable - not policy-related
+            }
+        }
+    }
+}

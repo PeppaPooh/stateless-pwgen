@@ -14,6 +14,20 @@ pub enum GenError {
     InvalidInput(&'static str),
 }
 
+/// Generates a deterministic password from the given inputs.
+///
+/// # Arguments
+///
+/// * `master` - Master secret
+/// * `site` - Site identifier (will be trimmed and lowercased)
+/// * `username` - Optional username
+/// * `policy_in` - Policy (will be validated; assumes it has been validated via `policy::validate()`)
+/// * `version` - Version/rotation number
+///
+/// # Precondition
+///
+/// Assumes `policy_in` has been validated via `policy::validate()`. The policy validation
+/// ensures all invariants are satisfied, so this function does not re-check policy bounds.
 pub fn generate_password(
     master: &str,
     site: &str,
@@ -25,7 +39,7 @@ pub fn generate_password(
     let site_id = site.trim().to_ascii_lowercase();
     let username_bytes = username.unwrap_or("").as_bytes();
 
-    // Validate policy (also clamps fields)
+    // Validate policy - this is the single source of truth for policy validation
     let policy = policy::validate(policy_in)?;
 
     // Derive KDF key (32 bytes)
@@ -51,18 +65,17 @@ pub fn generate_password(
     key.zeroize();
 
     // Choose length L
+    // Policy has been validated, so we know: 1 ≤ min ≤ max ≤ 128, min ≥ forced_count, allow is nonempty
     let min = policy.min;
     let max = policy.max;
     let mut forced_sets = policy::forced_sets(&policy);
     let forced_count = forced_sets.len() as u8;
 
-    if min == 0 || max == 0 || min > max || min > 128 || max > 128 {
-        return Err(GenError::InvalidInput("invalid min/max after validation"));
-    }
-
-    if min < forced_count {
-        return Err(GenError::InvalidInput("min less than number of forced sets"));
-    }
+    // Defense-in-depth: these should never happen after validation, but check in debug builds
+    debug_assert!(min >= 1 && min <= 128, "min should be in [1,128] after validation");
+    debug_assert!(max >= 1 && max <= 128, "max should be in [1,128] after validation");
+    debug_assert!(min <= max, "min should be ≤ max after validation");
+    debug_assert!(min >= forced_count, "min should be ≥ forced_count after validation");
 
     let length: u8 = if min == max {
         min
@@ -72,15 +85,14 @@ pub fn generate_password(
         min + draw
     };
 
-    if forced_count > length {
-        return Err(GenError::InvalidInput("forced_count exceeds chosen length"));
-    }
+    // Defense-in-depth: chosen length is between min and max, and min ≥ forced_count, so forced_count ≤ length
+    debug_assert!(length >= min && length <= max, "chosen length should be in [min, max]");
+    debug_assert!(forced_count <= length, "forced_count should be ≤ length after validation");
 
     // Build characters
+    // Policy validation ensures allow is nonempty, so union will be nonempty
     let union = policy::allowed_alphabet(&policy);
-    if union.is_empty() {
-        return Err(GenError::InvalidInput("allowed union is empty"));
-    }
+    debug_assert!(!union.is_empty(), "allowed alphabet should be nonempty after validation");
 
     let mut out = Vec::<u8>::with_capacity(length as usize);
 

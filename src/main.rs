@@ -145,13 +145,13 @@ fn handle_generate(args: GenerateArgs) -> Result<i32> {
         return Ok(2);
     }
 
-    // Determine length constraints
-    let (length, min, max) = normalize_length(args.length, args.min, args.max).map_err(|e| {
+    // Determine length constraints (CLI input shape validation only)
+    let (_length, min, max) = normalize_length(args.length, args.min, args.max).map_err(|e| {
         eprintln!("invalid input: {}", e);
         anyhow!(e)
     })?;
 
-    // Determine allowed and forced sets
+    // Determine allowed and forced sets (CLI input shape validation only)
     let (allowed, forced) = normalize_policy_sets(
         &args.allow_sets,
         &args.force_sets,
@@ -165,28 +165,22 @@ fn handle_generate(args: GenerateArgs) -> Result<i32> {
         anyhow!(e)
     })?;
 
-    // Validate forced count against chosen length
-    let forced_count = forced.iter().filter(|&&b| b).count() as u32;
-    let chosen_len = length.unwrap_or(min.max(1));
-    if chosen_len < forced_count {
-        master.zeroize();
-        eprintln!(
-            "invalid input: forced set count ({}) exceeds chosen length ({})",
-            forced_count, chosen_len
-        );
-        return Ok(2);
-    }
-
-    let pol = policy::Policy {
-        min: min as u8,
-        max: max as u8,
-        allow: allowed,
-        force: forced,
+    // Convert CLI inputs to Policy, handling u32 -> u8 conversion safely
+    // All policy invariant validation will be done by policy::validate()
+    let pol = match cli_to_policy(min, max, allowed, forced) {
+        Ok(p) => p,
+        Err(e) => {
+            master.zeroize();
+            eprintln!("invalid input: {}", e);
+            return Ok(2);
+        }
     };
-    // Validate policy
+
+    // Validate policy - this is the single source of truth for policy invariants
     let pol = match policy::validate(&pol) {
         Ok(p) => p,
         Err(e) => {
+            master.zeroize();
             eprintln!("invalid input: {}", e);
             return Ok(2);
         }
@@ -244,6 +238,10 @@ fn handle_generate(args: GenerateArgs) -> Result<i32> {
     }
 }
 
+/// Converts CLI length inputs to normalized form.
+/// 
+/// This function only performs basic input shape validation (non-zero, reasonable bounds).
+/// Actual policy bounds validation (1 ≤ min ≤ max ≤ 128) is done by `policy::validate()`.
 fn normalize_length(length: Option<u32>, min: u32, max: u32) -> std::result::Result<(Option<u32>, u32, u32), String> {
     const MAX_ALLOWED: u32 = 128;
     if let Some(len) = length {
@@ -252,6 +250,7 @@ fn normalize_length(length: Option<u32>, min: u32, max: u32) -> std::result::Res
         }
         return Ok((Some(len), len, len));
     }
+    // Basic sanity checks for UX - full validation happens in policy::validate()
     if min == 0 || min > MAX_ALLOWED {
         return Err(format!("--min must be within [1,{}]", MAX_ALLOWED));
     }
@@ -264,6 +263,10 @@ fn normalize_length(length: Option<u32>, min: u32, max: u32) -> std::result::Res
     Ok((None, min, max))
 }
 
+/// Converts CLI charset inputs to normalized boolean arrays.
+/// 
+/// This function performs basic CLI input shape validation (early UX feedback).
+/// Actual policy invariant validation (allow nonempty, force ⊆ allow) is done by `policy::validate()`.
 fn normalize_policy_sets(
     allow_list: &[CliCharset],
     force_list: &[CliCharset],
@@ -299,6 +302,7 @@ fn normalize_policy_sets(
         allowed[3] = false;
     }
 
+    // Early UX feedback - full validation in policy::validate()
     if !allowed.iter().any(|&b| b) {
         return Err("allowed sets cannot be empty".to_string());
     }
@@ -310,7 +314,7 @@ fn normalize_policy_sets(
         force_list.contains(&CliCharset::Symbol),
     ];
 
-    // Forced must be subset of allowed
+    // Early UX feedback - full validation in policy::validate()
     if (forced[0] && !allowed[0]) || (forced[1] && !allowed[1]) || (forced[2] && !allowed[2]) || (forced[3] && !allowed[3]) {
         return Err("forced sets must be subset of allowed".to_string());
     }
@@ -346,6 +350,36 @@ fn read_master_stdin() -> Result<String> {
         }
     }
     Ok(buf)
+}
+
+/// Safely converts CLI inputs (u32) to Policy (u8), ensuring no lossy casts.
+/// 
+/// This helper ensures that min/max values are within valid range [1, 128] before
+/// casting from u32 to u8. The returned Policy is not yet validated - call
+/// `policy::validate()` to enforce all invariants.
+fn cli_to_policy(
+    min: u32,
+    max: u32,
+    allow: [bool; 4],
+    force: [bool; 4],
+) -> std::result::Result<policy::Policy, String> {
+    const MAX_VALID: u32 = 128;
+    
+    // Ensure values fit in u8 before casting
+    if min == 0 || min > MAX_VALID {
+        return Err(format!("min length must be within [1,{}]", MAX_VALID));
+    }
+    if max == 0 || max > MAX_VALID {
+        return Err(format!("max length must be within [1,{}]", MAX_VALID));
+    }
+    
+    // Safe cast: we've verified both values are in [1, 128]
+    Ok(policy::Policy {
+        min: min as u8,
+        max: max as u8,
+        allow,
+        force,
+    })
 }
 
 fn escape_json_string(input: &str) -> String {

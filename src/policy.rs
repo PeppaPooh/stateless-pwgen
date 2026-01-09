@@ -46,12 +46,24 @@ pub fn default_policy() -> Policy {
     }
 }
 
-/// Validates invariants; returns normalized copy (clamps to [1,128]).
+/// Validates invariants and returns normalized copy (clamps to [1,128]).
+///
+/// This is the **canonical validator** for all policy invariants. If this function
+/// returns `Ok(policy)`, the policy is safe to use for generation. The returned policy
+/// satisfies:
+///
+/// - `1 ≤ min ≤ max ≤ 128`
+/// - `allow` is not empty
+/// - `force ⊆ allow`
+/// - `min ≥ forced_count` (where forced_count is the number of forced sets)
+///
+/// After validation, the generator should not need to re-check any policy-related invariants.
 pub fn validate(policy: &Policy) -> Result<Policy, PolicyError> {
-    // Clamp to [1,128]
-    let mut min = policy.min.clamp(1, 128);
-    let mut max = policy.max.clamp(1, 128);
+    // Clamp to [1,128] - this ensures min and max are always in valid range
+    let min = policy.min.clamp(1, 128);
+    let max = policy.max.clamp(1, 128);
 
+    // Enforce 1 ≤ min ≤ max ≤ 128
     if min > max {
         return Err(PolicyError::InvalidBounds);
     }
@@ -59,30 +71,22 @@ pub fn validate(policy: &Policy) -> Result<Policy, PolicyError> {
     let allow = policy.allow;
     let force = policy.force;
 
-    // Allowed union nonempty
+    // Allowed union must be nonempty
     if !allow.iter().any(|&b| b) {
         return Err(PolicyError::EmptyAllowed);
     }
 
-    // force[i] implies allow[i]
+    // Enforce force ⊆ allow: each forced set must be in allowed sets
     for i in 0..4 {
         if force[i] && !allow[i] {
             return Err(PolicyError::ForceNotSubset);
         }
     }
 
-    // If min < number of forced sets, reject
+    // Enforce min ≥ forced_count (where forced_count is the number of forced sets)
     let forced_count = force.iter().filter(|&&b| b).count() as u8;
     if min < forced_count {
         return Err(PolicyError::MinLessThanForcedCount);
-    }
-
-    // If min==0 due to input (should be clamped already), ensure at least 1
-    if min == 0 {
-        min = 1;
-    }
-    if max == 0 {
-        max = 1;
     }
 
     Ok(Policy { min, max, allow, force })
