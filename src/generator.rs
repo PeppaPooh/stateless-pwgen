@@ -118,7 +118,7 @@ pub fn generate_password(
     debug_assert_eq!(out.len() as u8, length);
 
     // Convert to String (ASCII), return
-    let s = String::from_utf8(out.clone()).expect("output must be valid ASCII");
+    let s = String::from_utf8(out).expect("output must be valid ASCII");
 
     // Zeroize temporary buffers where practical
     // Note: 'out' contains final password; caller may want to hold it, so we can't zeroize after move.
