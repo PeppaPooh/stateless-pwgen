@@ -48,7 +48,7 @@ fn prng_golden_vectors() {
     
     // Generate first 64 bytes and verify against golden vector
     let mut bytes = [0u8; 64];
-    rng.fill(&mut bytes);
+    rng.fill(&mut bytes).unwrap();
     
     let expected = [
         96, 72, 158, 207, 10, 30, 162, 206, 191, 247, 165, 10, 33, 134, 189, 248,
@@ -60,7 +60,7 @@ fn prng_golden_vectors() {
     
     // Test next_index with specific values
     let mut rng2 = prng::from_key_and_context(&key, info).unwrap();
-    let indices: Vec<usize> = (0..20).map(|_| rng2.next_index(10)).collect();
+    let indices: Vec<usize> = (0..20).map(|_| rng2.next_index(10).unwrap()).collect();
     let expected_indices = vec![6, 2, 8, 7, 0, 0, 2, 6, 1, 7, 5, 0, 3, 4, 9, 8, 1, 3, 1, 5];
     assert_eq!(indices, expected_indices, "PRNG next_index golden vector failed");
 }

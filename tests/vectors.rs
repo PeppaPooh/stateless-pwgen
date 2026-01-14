@@ -47,22 +47,22 @@ fn prng_test_vectors() {
     // Generate some bytes and verify they're deterministic
     let mut bytes1 = [0u8; 100];
     let mut bytes2 = [0u8; 100];
-    rng1.fill(&mut bytes1);
-    rng2.fill(&mut bytes2);
+    rng1.fill(&mut bytes1).unwrap();
+    rng2.fill(&mut bytes2).unwrap();
     assert_eq!(bytes1, bytes2, "PRNG should be deterministic for same inputs");
     
     // Test vector 2: Different contexts produce different outputs
     let mut rng3 = prng::from_key_and_context(&key, b"different-context").unwrap();
     let mut bytes3 = [0u8; 100];
-    rng3.fill(&mut bytes3);
+    rng3.fill(&mut bytes3).unwrap();
     assert_ne!(bytes1, bytes3, "Different contexts should produce different outputs");
     
     // Test vector 3: next_index method
     let mut rng4 = prng::from_key_and_context(&key, info).unwrap();
     let mut rng5 = prng::from_key_and_context(&key, info).unwrap();
     
-    let indices1: Vec<usize> = (0..50).map(|_| rng4.next_index(10)).collect();
-    let indices2: Vec<usize> = (0..50).map(|_| rng5.next_index(10)).collect();
+    let indices1: Vec<usize> = (0..50).map(|_| rng4.next_index(10).unwrap()).collect();
+    let indices2: Vec<usize> = (0..50).map(|_| rng5.next_index(10).unwrap()).collect();
     assert_eq!(indices1, indices2, "next_index should be deterministic");
     
     // Verify all indices are in valid range
@@ -72,10 +72,10 @@ fn prng_test_vectors() {
     
     // Test vector 4: Edge cases for next_index
     let mut rng6 = prng::from_key_and_context(&key, info).unwrap();
-    let idx1 = rng6.next_index(1); // Should always be 0
+    let idx1 = rng6.next_index(1).unwrap(); // Should always be 0
     assert_eq!(idx1, 0, "next_index(1) should always return 0");
     
-    let idx256 = rng6.next_index(256); // Should be in [0, 256)
+    let idx256 = rng6.next_index(256).unwrap(); // Should be in [0, 256)
     assert!(idx256 < 256, "next_index(256) should return values in [0, 256)");
 }
 

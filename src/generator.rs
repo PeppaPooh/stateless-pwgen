@@ -81,7 +81,7 @@ pub fn generate_password(
         min
     } else {
         let range = (max - min + 1) as usize;
-        let draw = rng.next_index(range) as u8;
+        let draw = rng.next_index(range)? as u8;
         min + draw
     };
 
@@ -98,20 +98,20 @@ pub fn generate_password(
 
     // Forced picks: fixed order lower -> upper -> digit -> symbol
     for (_set, alphabet) in forced_sets.drain(..) {
-        let idx = rng.next_index(alphabet.len());
+        let idx = rng.next_index(alphabet.len())?;
         out.push(alphabet[idx]);
     }
 
     // Fill remaining with union
     let remaining = length as usize - out.len();
     for _ in 0..remaining {
-        let idx = rng.next_index(union.len());
+        let idx = rng.next_index(union.len())?;
         out.push(union[idx]);
     }
 
     // Deterministic Fisher–Yates shuffle
     for i in (1..out.len()).rev() {
-        let j = rng.next_index(i + 1);
+        let j = rng.next_index(i + 1)?;
         out.swap(i, j);
     }
 
@@ -119,10 +119,12 @@ pub fn generate_password(
 
     // Convert to String (ASCII), return
     let s = String::from_utf8(out).expect("output must be valid ASCII");
-
-    // Zeroize temporary buffers where practical
-    // Note: 'out' contains final password; caller may want to hold it, so we can't zeroize after move.
-    // We clear intermediate containers that we still own.
-    // 'union' and 'info' contain policy/context (non-secret), but we can drop naturally.
+// Cleanup notes:
+// - The derived KDF key is zeroized immediately after constructing the PRNG.
+// - The generated password bytes are moved into the returned String; we cannot
+//   zeroize them here because the caller must receive/hold the password.
+// - Context/policy metadata (info, allowed alphabets, site_id, etc.) are not
+//   cryptographic secrets; they are dropped normally (see below for optional
+//   zeroization if we want to treat them as sensitive metadata).
     Ok(s)
 }
