@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "TODOs.md",
+                "file": "README.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "TODOs"
+              "title": "README"
             }
           }
         ]
@@ -171,6 +171,7 @@
   },
   "active": "75eaa9a84e205cc0",
   "lastOpenFiles": [
+    "TODOs.md",
     "README.md",
     "target/debug/deps/pwgen-6a486d638423bb70",
     "target/debug/incremental/pwgen-1bhjmo1yujyg8/s-heuxobh0bn-0dh18p2-14x49fahz7l7qtz3pbsw9d178/work-products.bin",
@@ -182,7 +183,6 @@
     "target/debug/incremental/pwgen-1bhjmo1yujyg8/s-heuxobh0bn-0dh18p2-14x49fahz7l7qtz3pbsw9d178/ecsb5bi2fkzcql0lme0qrr5d6.o",
     "target/debug/incremental/pwgen-1bhjmo1yujyg8/s-heuxobh0bn-0dh18p2-14x49fahz7l7qtz3pbsw9d178/ea8cutzr4vrv6rv3gx9cxmvj8.o",
     "target/debug/incremental/pwgen-1bhjmo1yujyg8/s-heuxobh0bn-0dh18p2-14x49fahz7l7qtz3pbsw9d178/e7umpa7zi7gnsy8p93zv417f7.o",
-    "TODOs.md",
     "target/doc/static.files/rust-logo-9a9549ea.svg",
     "target/doc/static.files/favicon-32x32-6580c154.png",
     "target/doc/static.files/favicon-044be391.svg",

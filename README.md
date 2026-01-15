@@ -60,7 +60,15 @@ cargo build --release
 cargo build --release --no-default-features
 ```
 
+## Installation
 
+To make `pwgen` accessible from anywhere on your system, install it globally:
+
+```
+cargo install --path . --force
+```
+
+This installs the binary to `~/.cargo/bin`, which should be in your PATH. After installation, you can run `pwgen` from any directory in your terminal.
 
 ## How to use
 
