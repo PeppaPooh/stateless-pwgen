@@ -9,16 +9,26 @@ use pwgen::policy;
 
 /// CLI for deterministic password generator.
 #[derive(Debug, Parser)]
-#[command(name = "pwgen", version, about = "Deterministic password generator using Argon2id and HKDF")]
+#[command(
+    name = "pwgen",
+    version,
+    about = "Deterministic password generator using Argon2id and HKDF",
+    disable_help_flag = true,
+    disable_version_flag = true,
+    disable_help_subcommand = true
+)]
 struct Cli {
     #[command(subcommand)]
-    command: Commands,
+    command: Option<Commands>,
 }
 
 #[derive(Debug, Subcommand)]
 enum Commands {
     /// Generate a password
+    #[command(disable_help_flag = true)]
     Generate(GenerateArgs),
+    /// Show detailed help information
+    Help,
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq, ValueEnum)]
@@ -105,6 +115,18 @@ struct GenerateArgs {
 }
 
 fn main() {
+    // Handle version flags before clap parsing
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() > 1 {
+        match args[1].as_str() {
+            "-v" | "--version" => {
+                println!("{}", env!("CARGO_PKG_VERSION"));
+                process::exit(0);
+            }
+            _ => {}
+        }
+    }
+    
     let cli = Cli::parse();
     let exit_code = match run(cli) {
         Ok(code) => code,
@@ -118,8 +140,47 @@ fn main() {
 
 fn run(cli: Cli) -> Result<i32> {
     match cli.command {
-        Commands::Generate(args) => handle_generate(args),
+        Some(Commands::Generate(args)) => handle_generate(args),
+        Some(Commands::Help) => {
+            print_long_help();
+            Ok(0)
+        }
+        None => {
+            print_short_help();
+            Ok(0)
+        }
     }
+}
+
+fn print_short_help() {
+    println!("pwgen - Deterministic password generator using Argon2id and HKDF");
+    println!();
+    println!("Usage:");
+    println!("  pwgen                    Show this help message");
+    println!("  pwgen help               Show detailed help");
+    println!("  pwgen generate --site X  Generate a password (prompts for master secret)");
+    println!();
+    println!("For detailed help, run: pwgen help");
+}
+
+fn print_long_help() {
+    // Build the generate command with all its arguments to show detailed help
+    let mut generate_cmd = {
+        let cmd = clap::Command::new("generate")
+            .about("Generate a password")
+            .disable_help_flag(true);
+        GenerateArgs::augment_args(cmd)
+    };
+    
+    // Print the help for the generate subcommand
+    generate_cmd.print_help().unwrap_or_else(|_| {
+        // Fallback if printing fails
+        eprintln!("pwgen generate - Generate a password");
+        eprintln!();
+        eprintln!("Usage: pwgen generate --site <STRING> [OPTIONS]");
+        eprintln!();
+        eprintln!("For full documentation, see the README.md file.");
+    });
 }
 
 fn handle_generate(args: GenerateArgs) -> Result<i32> {
