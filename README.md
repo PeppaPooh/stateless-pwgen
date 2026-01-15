@@ -42,7 +42,7 @@ Use a conventional password management tool to manage truly random string(s) whi
 
 ## Limitations
 1. stateless-pwgen does not defend against phishing, which a browser-extension password keeper can by noting the different url.
-2. GUI is still under development. TTY prompting doesn't show the password, so typos can happen.
+2. GUI is still under development. 
 3. Does not keep track of usernames or other login info. TODO cache non-password login info
 
 

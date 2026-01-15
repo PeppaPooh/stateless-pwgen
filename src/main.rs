@@ -32,7 +32,6 @@ enum CliCharset {
 #[derive(Debug, Args)]
 #[command(group(
     ArgGroup::new("master_input")
-        .required(true)
         .args(["master", "master_prompt", "master_stdin"]) 
 ))]
 struct GenerateArgs {
@@ -131,12 +130,13 @@ fn handle_generate(args: GenerateArgs) -> Result<i32> {
         return Ok(2);
     }
 
-    // Resolve master secret via exactly one method (clap group enforces one)
+    // Resolve master secret: default to prompt if no method specified
     let mut master = match (args.master, args.master_prompt, args.master_stdin) {
         (Some(m), false, false) => m,
         (None, true, false) => read_master_prompt()?,
         (None, false, true) => read_master_stdin()?,
-        _ => unreachable!("clap ArgGroup enforces exclusivity"),
+        (None, false, false) => read_master_prompt()?, // Default: prompt when no method specified
+        _ => unreachable!("clap ArgGroup enforces at most one method"),
     };
 
     if master.is_empty() {
@@ -326,14 +326,16 @@ fn read_master_prompt() -> Result<String> {
     #[cfg(feature = "tty")]
     {
         let prompt = "Master: ";
-        let master = rpassword::prompt_password(prompt).context("failed to read TTY password")?;
+        // prompt_password() reads from TTY and hides input, even when stdin is redirected
+        let master = rpassword::prompt_password(prompt)
+            .context("failed to read TTY password")?;
         Ok(master)
     }
 
     #[cfg(not(feature = "tty"))]
     {
         Err(anyhow!(
-            "--master-prompt requested but binary built without 'tty' feature (enable with --features tty)"
+            "TTY prompting is not available in this build (built with --no-default-features). Use --master-stdin or rebuild with default features."
         ))
     }
 }

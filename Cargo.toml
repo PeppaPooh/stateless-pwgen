@@ -1,6 +1,6 @@
 [package]
 name = "pwgen"
-version = "0.1.0"
+version = "0.1.2"
 edition = "2021"
 
 # Optional but recommended metadata
@@ -36,7 +36,7 @@ rpassword = { version = "7", optional = true }
 itoa = "1"
 
 [features]
-default = []
+default = ["tty"]
 # Enable silent TTY master prompt support
-tty = ["rpassword"]
+tty = ["dep:rpassword"]
 
