@@ -42,22 +42,22 @@ Use a conventional password management tool to manage truly random string(s) whi
 
 ## Limitations
 1. stateless-pwgen does not defend against phishing, which a browser-extension password keeper can by noting the different url.
-2. GUI is still under development. --master-prompt doesn't show the password, so typos can happen.
+2. GUI is still under development. TTY prompting doesn't show the password, so typos can happen.
 3. Does not keep track of usernames or other login info. TODO cache non-password login info
 
 
 ## How to Build
 
-- Default build:
+- Default build (includes TTY prompting support):
 
 ```
 cargo build --release
 ```
 
-- Enable TTY prompt for the master secret:
+- Build without TTY support (for environments without terminal access):
 
 ```
-cargo build --release --features tty
+cargo build --release --no-default-features
 ```
 
 ## How to use
@@ -79,13 +79,18 @@ pwgen generate \
 - `--site <STRING>`  
   The site identifier for which to generate a password. This value is trimmed of whitespace and converted to lowercase before use. It is used to derive a unique password per site.
 
-- Exactly one master secret source must be provided (choose one of the following):
-  - `--master <STRING>`  
-    Provide the master secret directly on the command line. **Warning:** This is insecure, as the secret may be visible in process listings or shell history.
-  - `--master-prompt`  
-    Securely prompt for the master secret on the terminal (TTY). This is the recommended method, but requires building with `--features tty` to enable TTY support.
-  - `--master-stdin`  
-    Read the entire standard input as the master secret. Useful for scripting or when piping secrets from other tools.
+**Master secret input (optional, defaults to TTY prompt):**
+
+If no master secret input method is specified, the program will prompt for the master secret on the terminal (TTY). You can also explicitly choose one of the following:
+
+- `--master <STRING>`  
+  Provide the master secret directly on the command line. **Warning:** This is insecure, as the secret may be visible in process listings or shell history.
+- `--master-prompt`  
+  Explicitly prompt for the master secret on the terminal (TTY). This is the default behavior if no master input method is specified.
+- `--master-stdin`  
+  Read the entire standard input as the master secret. Useful for scripting or when piping secrets from other tools.
+
+**Note:** Only one master secret input method can be specified at a time.
 
 **Optional flags:**
 
@@ -122,19 +127,19 @@ pwgen generate \
 
 ### Examples
 
-- Prompt for master (recommended):
+- Default behavior (prompts for master secret):
 
 ```
-pwgen generate --site example.com --master-prompt
+pwgen generate --site example.com
 ```
 
-- Fixed length 20, force at least one symbol:
+- Fixed length 20, force at least one symbol (using stdin for master):
 
 ```
 pwgen generate --site example.com --master-stdin --length 20 --force symbol
 ```
 
-- JSON output with username and policy tweaks:
+- JSON output with username and policy tweaks (prompts for master):
 
 ```
 pwgen generate --site example.com --username alice --min 14 --max 18 --no-symbol --json
@@ -166,7 +171,7 @@ pwgen generate --site example.com --username alice --min 14 --max 18 --no-symbol
 ## Security notes
 
 - Master secret is zeroized after use; KDF buffers and PRK are zeroized on drop.
-- Build with `--features tty` to avoid echoing the master secret on the terminal.
+- TTY prompting is enabled by default and reads from the controlling terminal (`/dev/tty`), ensuring secure password entry even when stdin is redirected.
 - No DNS/IDNA normalization in v0.1; `--site` is lowercased + trimmed only.
 
 ## Development
