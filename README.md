@@ -35,6 +35,9 @@ Either 1) use the --version flag to rotate different passwords, or 2) put notes 
 #### 1. For convenience
 Use conventional password management on your stateless-pwgen generated passwords. Use stateless-pwgen as plan B (a safer replacement to the "backup password book") for when you can't recover your password. This has slightly less security than using true random passwords with conventional password management, but ***if you are deterred from random passwords by the fear of losing them, this is the solution.***
 
+To keep track of site names and version names, I recommend using an encryption program such as [VeraCrypt](https://veracrypt.jp/en/Home.html) or [Age](https://github.com/FiloSottile/age) to protect a text document. A cache option may be added to future stateless-pwgen options.
+
+
 #### 2. For security
 Use a conventional password management tool to manage truly random string(s) which you use as site identifier(s) for stateless-pwgen. Obviously very inconvenient, but leak-proofs your passwords. 
 
