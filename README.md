@@ -45,24 +45,9 @@ Use a conventional password management tool to manage truly random string(s) whi
 2. GUI is still under development. 
 3. Does not keep track of usernames or other login info. TODO cache non-password login info
 
-
-## How to Build
-
-- Default build (includes TTY prompting support):
-
-```
-cargo build --release
-```
-
-- Build without TTY support (for environments without terminal access):
-
-```
-cargo build --release --no-default-features
-```
-
 ## Installation
 
-To make `pwgen` accessible from anywhere on your system, install it globally:
+To make `pwgen` accessible from anywhere on your system, run this in your /pwgen directory:
 
 ```
 cargo install --path . --force
