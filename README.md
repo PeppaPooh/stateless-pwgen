@@ -53,8 +53,16 @@ Use a conventional password management tool to manage truly random string(s) whi
 To make `pwgen` accessible from anywhere on your system, run this in your /pwgen directory:
 
 ```
+cargo install --path .
+```
+
+To update an already installed 'pwgen' on your computer, run
+
+```
 cargo install --path . --force
 ```
+
+
 
 This installs the binary to `~/.cargo/bin`, which should be in your PATH. After installation, you can run `pwgen` from any directory in your terminal.
 

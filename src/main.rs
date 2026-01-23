@@ -45,15 +45,15 @@ enum CliCharset {
         .args(["master", "master_prompt", "master_stdin"]) 
 ))]
 struct GenerateArgs {
-    /// Site identifier (trimmed and lowercased)
+    /// Site identifier
     #[arg(long, value_name = "STRING")]
     site: String,
 
-    /// Master secret provided directly (dangerous)
+    /// Master secret provided directly (risky, not recommended)
     #[arg(long, value_name = "STRING")]
     master: Option<String>,
 
-    /// Prompt for master secret on the TTY (preferred)
+    /// Prompt for master secret on the TTY (default)
     #[arg(long = "master-prompt")]
     master_prompt: bool,
 
@@ -119,7 +119,7 @@ fn main() {
     let args: Vec<String> = std::env::args().collect();
     if args.len() > 1 {
         match args[1].as_str() {
-            "-v" | "--version" => {
+            "-v" => {
                 println!("{}", env!("CARGO_PKG_VERSION"));
                 process::exit(0);
             }
@@ -158,12 +158,22 @@ fn print_short_help() {
     println!("Usage:");
     println!("  pwgen                    Show this help message");
     println!("  pwgen help               Show detailed help");
+    println!("  pwgen -v                 Show the pwgen version");
     println!("  pwgen generate --site X  Generate a password (prompts for master secret)");
     println!();
     println!("For detailed help, run: pwgen help");
 }
 
 fn print_long_help() {
+    println!("pwgen - Deterministic password generator using Argon2id and HKDF");
+    println!();
+    println!("Usage:");
+    println!("  pwgen help               Show this detailed help");
+    println!("  pwgen -v                 Show the pwgen version");
+    println!("  pwgen generate --site X  Generate a password (prompts for master secret)");
+    println!();
+    println!("Generate options:");
+
     // Build the generate command with all its arguments to show detailed help
     let mut generate_cmd = {
         let cmd = clap::Command::new("generate")
