@@ -1,0 +1,88 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # macOS
+          - os: macos-14
+            target: aarch64-apple-darwin
+            ext: ""
+            archive: tar.gz
+          - os: macos-13
+            target: x86_64-apple-darwin
+            ext: ""
+            archive: tar.gz
+
+          # Linux
+          - os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            ext: ""
+            archive: tar.gz
+
+          # Windows
+          - os: windows-2022
+            target: x86_64-pc-windows-msvc
+            ext: ".exe"
+            archive: zip
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Build
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Package (unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          set -euxo pipefail
+          BIN="pwgen${{ matrix.ext }}"
+          SRC="target/${{ matrix.target }}/release/$BIN"
+          OUT="pwgen-${GITHUB_REF_NAME}-${{ matrix.target }}"
+          mkdir -p dist/$OUT
+          cp "$SRC" "dist/$OUT/pwgen"
+          cp README.md LICENSE "dist/$OUT/" || true
+          (cd dist && tar -czf "${OUT}.tar.gz" "$OUT")
+          (cd dist && shasum -a 256 "${OUT}.tar.gz" > "${OUT}.tar.gz.sha256")
+
+      - name: Package (windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $bin = "pwgen${{ matrix.ext }}"
+          $src = "target\${{ matrix.target }}\release\$bin"
+          $out = "pwgen-$env:GITHUB_REF_NAME-${{ matrix.target }}"
+          New-Item -ItemType Directory -Force -Path "dist\$out" | Out-Null
+          Copy-Item $src "dist\$out\pwgen.exe"
+          if (Test-Path README.md) { Copy-Item README.md "dist\$out\" }
+          if (Test-Path LICENSE) { Copy-Item LICENSE "dist\$out\" }
+          Compress-Archive -Path "dist\$out\*" -DestinationPath "dist\$out.zip" -Force
+          $hash = (Get-FileHash "dist\$out.zip" -Algorithm SHA256).Hash.ToLower()
+          "$hash  $out.zip" | Out-File -Encoding ascii "dist\$out.zip.sha256"
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.tar.gz
+            dist/*.tar.gz.sha256
+            dist/*.zip
+            dist/*.zip.sha256
