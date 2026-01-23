@@ -18,6 +18,10 @@ Thumbs.db
 *.tmp
 *.temp
 
+
+# Distribution files
+/dist/
+
 # notes
 TODOs.md
 .obsidian/
